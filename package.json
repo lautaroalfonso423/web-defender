@@ -30,6 +30,7 @@
     "axios": "^1.13.4",
     "class-validator": "^0.14.3",
     "dotenv": "^17.2.3",
+    "hbs": "^4.2.0",
     "mongoose": "^9.1.5",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"
