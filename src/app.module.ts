@@ -2,15 +2,28 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
+import { Sites, SitesSchema } from './db/sites.entity';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
-
-const uri = "mongodb+srv://sebastiansosa3011:qM7CJBzL1gwLrHPB@prueba.ylwzz.mongodb.net/web-defender?appName=Prueba" 
 
 @Module({
   imports: [
-    MongooseModule.forRoot(uri)
+   
+  ConfigModule.forRoot({
+    isGlobal:true
+  }),
+  MongooseModule.forRootAsync({
+    imports: [ConfigModule],
+    inject: [ConfigService],
+    useFactory: (configService: ConfigService)=>({
+      uri: configService.get<string>("URI_DATABASE")
+    })
+  }),
+
+    MongooseModule.forFeature([{name: Sites.name, schema: SitesSchema}])
   ],
   controllers: [AppController],
   providers: [AppService],
 })
+
 export class AppModule {}
