@@ -9,7 +9,7 @@ Vigila tus aplicaciones web automáticamente. Esta herramienta rastrea cada pág
 * **Funcionalidad A:** Rastreo automático de cada página mediante un bucle cada 10 minutos.
 * **Funcionalidad B:** Notificación de estado (status) y frecuencia de respuesta.
 * **Optimización:** Rendimiento optimizado(Se puede mejorar).
-* **Interfaz:** En proceso.
+* **Interfaz:** [https://github.com/lautaroalfonso423/web-defender-interface].
 
 ## 🛠️ Tecnologías Utilizadas
 
