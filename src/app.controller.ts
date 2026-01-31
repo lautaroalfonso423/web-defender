@@ -22,7 +22,7 @@ export class AppController {
     return await this.appService.createSiteTest(props)
   } 
 
-  @Cron("45 * * * * * ")
+  @Cron(CronExpression.EVERY_10_MINUTES)
   async handleTestSite() {
     return this.appService.test()
   }
