@@ -20,7 +20,7 @@ export class AppController {
     return await this.appService.getViewSites();
   }
 
-  @Post()
+  @Post("creation")
   async createSite(
     @Body() props: SitesDto
   ){
