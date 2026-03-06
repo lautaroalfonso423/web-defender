@@ -5,6 +5,9 @@ import { Model } from 'mongoose';
 import { SitesDto } from './dto/sites.dto';
 import axios from 'axios';
 import { Check, CheckDocument } from './db/health.entity';
+import * as os from "os"
+import { SystemEnum } from './system.enum';
+import { cpuUsage } from 'process';
 
 @Injectable()
 export class AppService {
@@ -56,6 +59,7 @@ export class AppService {
     return await this.siteModel.find().exec();
   }
 
+
   async createSiteTest(props: SitesDto) {
     
     const newSite = await this.siteModel.create({
@@ -71,10 +75,13 @@ export class AppService {
       is_active: true,
     }).exec()
 
+
     for(const data of FilterSites){
       const startTime = performance.now()
       let statusCode: number = 0;
       let errorMessage: string | null = null;
+
+   
 
       try {
         const response = await axios.get(data.url, {timeout: 5000})
@@ -91,16 +98,29 @@ export class AppService {
       } finally {
         const TimeResponse = performance.now() - startTime;
 
-        await this.checkModel.create({
+        const totalMem = os.totalmem();
+        const freeMem = os.freemem()  
+        const usedMem = ((totalMem - freeMem) / totalMem) * 100;
+
+        let currentStatus = SystemEnum.HEALTHY
+        if(usedMem > 80) currentStatus = SystemEnum.WARNING 
+        if(usedMem > 90) currentStatus = SystemEnum.CRITICAL
+
+        const [load1, load5, load15] = os.loadavg();
+
+       await this.checkModel.create({
           site_id: data._id,
           status_code: statusCode,
           response_time_ms: TimeResponse,
+          ramUsage: usedMem,
+          status: currentStatus,
+          cpuUsage: Number(load1.toFixed(2) || load5.toFixed(2) || load15.toFixed(2)),
           checked_at: new Date(),
           error_message: errorMessage || "",
-
         })
         
-        this.logger.log(`Chequeo finalizado para ${data.name}: Status ${statusCode} (${TimeResponse}ms)`)
+        
+        this.logger.log(`Chequeo finalizado para ${data.name}: Status ${statusCode} (${TimeResponse}ms) Uso de RAM ${usedMem} : Uso de CPU ${load1 || load5 || load15}`)
 
       }
     }
