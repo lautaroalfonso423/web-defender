@@ -6,6 +6,7 @@ import { Sites, SitesSchema } from './db/sites.entity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { Check, CheckSchema } from './db/health.entity';
+import { EventsGateway } from './events.gateway';
 
 
 @Module({
@@ -24,7 +25,7 @@ import { Check, CheckSchema } from './db/health.entity';
     ScheduleModule.forRoot()
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, EventsGateway],
 })
 
 export class AppModule {}

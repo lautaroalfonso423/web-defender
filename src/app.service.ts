@@ -8,6 +8,7 @@ import { Check, CheckDocument } from './db/health.entity';
 import * as os from "os"
 import { SystemEnum } from './system.enum';
 import { cpuUsage } from 'process';
+import { EventsGateway } from './events.gateway';
 
 @Injectable()
 export class AppService {
@@ -15,8 +16,9 @@ export class AppService {
   
 
   constructor(
+    private readonly eventGateway: EventsGateway,                                                                                                                                                                                                                                               
     @InjectModel(Sites.name) private siteModel: Model<SitesDocument>,
-    @InjectModel(Check.name) private checkModel: Model<CheckDocument>                                                                                                                                                                                                                                                                   
+    @InjectModel(Check.name) private checkModel: Model<CheckDocument>
   ){}
   private readonly logger = new Logger(AppService.name)
 
@@ -108,7 +110,17 @@ export class AppService {
 
         const [load1, load5, load15] = os.loadavg();
 
-       await this.checkModel.create({
+
+
+        this.eventGateway.sendUpdate({
+          name: data.name,
+          status_code: statusCode,
+          status: currentStatus,
+          ram: usedMem,
+          cpu: load1.toFixed(2)
+        })
+
+        await this.checkModel.create({
           site_id: data._id,
           status_code: statusCode,
           response_time_ms: TimeResponse,
@@ -119,6 +131,7 @@ export class AppService {
           error_message: errorMessage || "",
         })
         
+       
         
         this.logger.log(`Chequeo finalizado para ${data.name}: Status ${statusCode} (${TimeResponse}ms) Uso de RAM ${usedMem} : Uso de CPU ${load1 || load5 || load15}`)
 
